@@ -1,0 +1,93 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/forms";
+
+@theme {
+  --font-mono: var(--font-tx-02);
+  --font-sans: var(--font-inter);
+}
+
+@keyframes scanlines {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(4px);
+  }
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 0.1;
+  }
+  5% {
+    opacity: 0.125;
+  }
+  10% {
+    opacity: 0.15;
+  }
+  15% {
+    opacity: 0.1;
+  }
+  20% {
+    opacity: 0.2;
+  }
+  25% {
+    opacity: 0.15;
+  }
+  30% {
+    opacity: 0.1;
+  }
+  35% {
+    opacity: 0.05;
+  }
+  40% {
+    opacity: 0.125;
+  }
+  45% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.1;
+  }
+  55% {
+    opacity: 0.05;
+  }
+  60% {
+    opacity: 0.125;
+  }
+  65% {
+    opacity: 0.15;
+  }
+  70% {
+    opacity: 0.1;
+  }
+  75% {
+    opacity: 0.05;
+  }
+  80% {
+    opacity: 0.125;
+  }
+  85% {
+    opacity: 0.15;
+  }
+  90% {
+    opacity: 0.1;
+  }
+  95% {
+    opacity: 0.05;
+  }
+  100% {
+    opacity: 0.125;
+  }
+}
+
+@layer utilities {
+  .animate-scanlines {
+    animation: scanlines 1s linear infinite;
+  }
+  
+  .animate-flicker {
+    animation: flicker 5s infinite;
+  }
+}
