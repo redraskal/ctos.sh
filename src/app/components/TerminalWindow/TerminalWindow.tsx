@@ -68,7 +68,6 @@ function TerminalControl({ label, color, pulseColor, onClick }: { label: string;
         absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
         text-[8px] font-bold tracking-wider
         text-white/70
-        pointer-events-none
         group-hover:text-white
         transition-colors
         select-none
@@ -186,7 +185,7 @@ function TerminalTitle() {
 
   return (
     <div className="
-      absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+      flex justify-center items-center w-full
       text-white/50 text-sm tracking-wider uppercase
       pointer-events-none
     ">
@@ -212,6 +211,7 @@ export default function TerminalWindow({
     width: typeof window !== 'undefined' ? (window.innerWidth < 768 ? window.innerWidth : 1024) : 1024,
     height: typeof window !== 'undefined' ? (window.innerWidth < 768 ? window.innerHeight : (isGameTerminal ? 600 : 700)) : 700
   }));
+  // TODO: just remove this so call depth isn't an issue
   const [isMobile, setIsMobile] = useState(() => 
     typeof window !== 'undefined' ? window.innerWidth < 768 : false
   );
@@ -225,8 +225,11 @@ export default function TerminalWindow({
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-      
+
+      if (isMobile !== mobile) {
+        setIsMobile(mobile);
+      }
+
       if (mobile) {
         setSize({
           width: window.innerWidth,
@@ -246,7 +249,7 @@ export default function TerminalWindow({
     isInitialized.current = true;
 
     return () => window.removeEventListener('resize', handleResize);
-  }, [terminalId, isGameTerminal, updateTerminalPosition]);
+  }, [isMobile, terminalId, isGameTerminal, updateTerminalPosition]);
 
   // Remove tilde key handler since it's now handled globally
   useEffect(() => {
@@ -407,7 +410,7 @@ export default function TerminalWindow({
         `}>
           {/* controls */}
           {!isGameTerminal && (
-            <div className="flex gap-3 z-10">
+            <div className="gap-3 z-10 hidden md:flex">
               <TerminalControl 
                 label="HAL" 
                 color="bg-gradient-to-r from-red-900/50 to-red-700/50"
@@ -497,7 +500,7 @@ export default function TerminalWindow({
                       transition-all duration-200
                       whitespace-nowrap
                       ${isCurrentPath ? 
-                        'bg-white/20 text-white shadow-[inset_0_0_10px_rgba(255,255,255,0.2)] opacity-50 pointer-events-none' : 
+                        'bg-white/20 text-white shadow-[inset_0_0_10px_rgba(255,255,255,0.2)] opacity-50' : 
                         'bg-black/50 text-white/70 hover:bg-white/10 hover:text-white cursor-pointer'
                       }
                     `}

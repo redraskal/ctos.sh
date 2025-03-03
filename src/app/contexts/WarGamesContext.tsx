@@ -27,7 +27,9 @@ export function WarGamesProvider({ children }: { children: ReactNode }) {
   return (
     <WarGamesContext.Provider value={{ isOpen, toggleTerminal }}>
       {children}
-      {isOpen && <WarGamesTerminal />}
+      {isOpen && <div className="fixed inset-0 z-50">
+        <WarGamesTerminal />
+      </div>}
     </WarGamesContext.Provider>
   );
 } 
