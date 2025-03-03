@@ -26,7 +26,7 @@ function ClientContent({ children }: { children: ReactNode }) {
   return (
     <>
       {/* cool background mesh thing */}
-      <div className="fixed inset-0">
+      <div className="fixed inset-0 hidden md:block">
         <SmartMeshCanvas 
           mesh={GlyphDitherMesh}
           meshProps={{
