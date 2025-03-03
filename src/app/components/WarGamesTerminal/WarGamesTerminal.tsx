@@ -32,9 +32,14 @@ export default function WarGamesTerminal() {
   const contentRef = useRef<HTMLDivElement>(null);
   const { toggleTerminal } = useWarGames();
 
+  // auto scroll to bottom of terminal
   useEffect(() => {
     if (contentRef.current) {
-      contentRef.current.scrollTop = contentRef.current.scrollHeight;
+      const parent = contentRef.current.parentElement;
+      
+      if (parent) {
+        parent.scrollTop = parent.scrollHeight;
+      }
     }
   }, [gameState.output]);
 
@@ -197,7 +202,7 @@ export default function WarGamesTerminal() {
   const content = (
     <div 
       ref={contentRef}
-      className="font-mono text-green-400 p-4 h-[60vh] overflow-auto"
+      className="font-mono text-green-400 p-4 overflow-hidden"
       style={{
         scrollbarColor: 'rgba(255,255,255,0.2) transparent',
         scrollbarWidth: 'thin'
