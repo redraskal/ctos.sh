@@ -152,6 +152,8 @@ function CodeEditorContent({
         border-r border-white/20
         text-right text-white/30
         min-w-[3rem]
+        hidden
+        md:block
       ">
         {Array.from({ length: lineCount }, (_, i) => (
           <div key={i + 1} className="leading-6">
