@@ -1,10 +1,10 @@
 'use client';
 
 import { ReactNode, useEffect } from 'react';
-import SmartMeshCanvas from "@/app/components/MeshCanvas/SmartMeshCanvas";
-import GlyphDitherMesh from "@/app/components/GlyphDitherMesh";
-import { MeshProvider, useMesh } from "../contexts/MeshContext";
-import { WarGamesProvider, useWarGames } from "../contexts/WarGamesContext";
+import SmartMeshCanvas from '@/app/components/MeshCanvas/SmartMeshCanvas';
+import GlyphDitherMesh from '@/app/components/GlyphDitherMesh';
+import { MeshProvider, useMesh } from '@/app/contexts/MeshContext';
+import { WarGamesProvider, useWarGames } from '@/app/contexts/WarGamesContext';
 
 function ClientContent({ children }: { children: ReactNode }) {
   const { meshColor, timeFactor } = useMesh();
@@ -27,24 +27,25 @@ function ClientContent({ children }: { children: ReactNode }) {
     <>
       {/* cool background mesh thing */}
       <div className="fixed inset-0 hidden md:block">
-        <SmartMeshCanvas 
+        <SmartMeshCanvas
           mesh={GlyphDitherMesh}
           meshProps={{
-            backgroundColor: "#000000",
+            backgroundColor: '#000000',
             color: meshColor,
             whirlFactor: 200,
             timeFactor: timeFactor,
             gridSize: 50.0,
           }}
         />
-        <div className="absolute inset-0" style={{
-          boxShadow: 'inset 0 0 100px 50px black'
-        }}></div>
+        <div
+          className="absolute inset-0"
+          style={{
+            boxShadow: 'inset 0 0 100px 50px black',
+          }}
+        ></div>
       </div>
 
-      <main className="relative">
-        {children}
-      </main>
+      <main className="relative">{children}</main>
     </>
   );
 }
@@ -57,4 +58,4 @@ export default function ClientWrapper({ children }: { children: ReactNode }) {
       </WarGamesProvider>
     </MeshProvider>
   );
-} 
+}

@@ -1,1 +1,1 @@
-export { SmartMesh } from './SmartMesh'; 
+export { default, type SmartMeshProps } from './SmartMesh';

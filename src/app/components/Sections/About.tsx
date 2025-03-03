@@ -11,4 +11,4 @@ export default function About({ text }: AboutProps) {
       </div>
     </section>
   );
-} 
+}

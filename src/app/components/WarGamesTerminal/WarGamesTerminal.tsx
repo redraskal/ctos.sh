@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useWarGames } from '@/app/contexts/WarGamesContext';
-import TerminalWindow from '../TerminalWindow/TerminalWindow';
+import TerminalWindow from '@/app/components/TerminalWindow';
 
 interface GameState {
   stage: 'login' | 'games' | 'launch' | 'simulation';
@@ -19,11 +19,21 @@ const INITIAL_STATE: GameState = {
   output: ['LOGON:'],
   missiles: 100,
   targets: [
-    'LAS VEGAS', 'SEATTLE', 'NEW YORK', 'WASHINGTON DC', 
-    'SAN FRANCISCO', 'CHICAGO', 'MIAMI', 'HOUSTON',
-    'LONDON', 'PARIS', 'MOSCOW', 'BEIJING', 'TOKYO'
+    'LAS VEGAS',
+    'SEATTLE',
+    'NEW YORK',
+    'WASHINGTON DC',
+    'SAN FRANCISCO',
+    'CHICAGO',
+    'MIAMI',
+    'HOUSTON',
+    'LONDON',
+    'PARIS',
+    'MOSCOW',
+    'BEIJING',
+    'TOKYO',
   ],
-  selectedTargets: []
+  selectedTargets: [],
 };
 
 export default function WarGamesTerminal() {
@@ -36,7 +46,7 @@ export default function WarGamesTerminal() {
   useEffect(() => {
     if (contentRef.current) {
       const parent = contentRef.current.parentElement;
-      
+
       if (parent) {
         parent.scrollTop = parent.scrollHeight;
       }
@@ -44,155 +54,157 @@ export default function WarGamesTerminal() {
   }, [gameState.output]);
 
   useEffect(() => {
-    const interval = setInterval(() => setCursorVisible(v => !v), 530);
+    const interval = setInterval(() => setCursorVisible((v) => !v), 530);
     return () => clearInterval(interval);
   }, []);
 
   const addOutput = useCallback((text: string | string[]) => {
-    setGameState(prev => ({
+    setGameState((prev) => ({
       ...prev,
-      output: [...prev.output, ...(Array.isArray(text) ? text : [text])]
+      output: [...prev.output, ...(Array.isArray(text) ? text : [text])],
     }));
   }, []);
 
-  const handleInput = useCallback((input: string) => {
-    if (input === 'EXIT') {
-      toggleTerminal();
-      return;
-    }
+  const handleInput = useCallback(
+    (input: string) => {
+      if (input === 'EXIT') {
+        toggleTerminal();
+        return;
+      }
 
-    setGameState(prev => ({
-      ...prev,
-      output: [...prev.output, `> ${input}`],
-      input: ''
-    }));
+      setGameState((prev) => ({
+        ...prev,
+        output: [...prev.output, `> ${input}`],
+        input: '',
+      }));
 
-    switch (gameState.stage) {
-      case 'login':
-        if (input === 'JOSHUA') {
-          setTimeout(() => {
-            addOutput([
-              'GREETINGS PROFESSOR FALKEN.',
-              '',
-              'SHALL WE PLAY A GAME?',
-              '',
-              'Available games:',
-              '- CHESS',
-              '- CHECKERS',
-              '- FIGHTER COMBAT',
-              '- GUERRILLA ENGAGEMENT',
-              '- DESERT WARFARE',
-              '- AIR-TO-GROUND ACTIONS',
-              '- THEATERWIDE TACTICAL WARFARE',
-              '- THEATERWIDE BIOTOXIC AND CHEMICAL WARFARE',
-              '- GLOBAL THERMONUCLEAR WAR',
-              ''
-            ]);
-            setGameState(prev => ({ ...prev, stage: 'games' }));
-          }, 1000);
-        } else {
-          setTimeout(() => {
-            addOutput(['IDENTIFICATION NOT RECOGNIZED BY SYSTEM', '--CONNECTION TERMINATED--', '', 'LOGON:']);
-          }, 500);
-        }
-        break;
-
-      case 'games':
-        if (input === 'GLOBAL THERMONUCLEAR WAR') {
-          setTimeout(() => {
-            addOutput([
-              '',
-              'WOULDN\'T YOU PREFER A GOOD GAME OF CHESS?',
-              ''
-            ]);
+      switch (gameState.stage) {
+        case 'login':
+          if (input === 'JOSHUA') {
             setTimeout(() => {
-              setGameState(prev => ({ ...prev, stage: 'launch' }));
               addOutput([
-                'FINE.',
+                'GREETINGS PROFESSOR FALKEN.',
                 '',
-                'AWAITING FIRST STRIKE COMMAND',
-                'PLEASE SPECIFY PRIMARY TARGETS:',
+                'SHALL WE PLAY A GAME?',
                 '',
-                ...gameState.targets.map((t, i) => `${i + 1}. ${t}`),
+                'Available games:',
+                '- CHESS',
+                '- CHECKERS',
+                '- FIGHTER COMBAT',
+                '- GUERRILLA ENGAGEMENT',
+                '- DESERT WARFARE',
+                '- AIR-TO-GROUND ACTIONS',
+                '- THEATERWIDE TACTICAL WARFARE',
+                '- THEATERWIDE BIOTOXIC AND CHEMICAL WARFARE',
+                '- GLOBAL THERMONUCLEAR WAR',
                 '',
-                'ENTER TARGET NUMBERS (comma-separated):',
               ]);
-            }, 2000);
-          }, 500);
-        } else {
-          addOutput(['THAT GAME IS NOT AVAILABLE.', '']);
-        }
-        break;
+              setGameState((prev) => ({ ...prev, stage: 'games' }));
+            }, 1000);
+          } else {
+            setTimeout(() => {
+              addOutput(['IDENTIFICATION NOT RECOGNIZED BY SYSTEM', '--CONNECTION TERMINATED--', '', 'LOGON:']);
+            }, 500);
+          }
+          break;
 
-      case 'launch':
-        const targetIndices = input.split(',').map(n => parseInt(n.trim()) - 1);
-        const selectedTargets = targetIndices
-          .filter(i => i >= 0 && i < gameState.targets.length)
-          .map(i => gameState.targets[i]);
+        case 'games':
+          if (input === 'GLOBAL THERMONUCLEAR WAR') {
+            setTimeout(() => {
+              addOutput(['', "WOULDN'T YOU PREFER A GOOD GAME OF CHESS?", '']);
+              setTimeout(() => {
+                setGameState((prev) => ({ ...prev, stage: 'launch' }));
+                addOutput([
+                  'FINE.',
+                  '',
+                  'AWAITING FIRST STRIKE COMMAND',
+                  'PLEASE SPECIFY PRIMARY TARGETS:',
+                  '',
+                  ...gameState.targets.map((t, i) => `${i + 1}. ${t}`),
+                  '',
+                  'ENTER TARGET NUMBERS (comma-separated):',
+                ]);
+              }, 2000);
+            }, 500);
+          } else {
+            addOutput(['THAT GAME IS NOT AVAILABLE.', '']);
+          }
+          break;
 
-        if (selectedTargets.length > 0) {
-          setGameState(prev => ({
-            ...prev,
-            stage: 'simulation',
-            selectedTargets
-          }));
-          addOutput([
-            '',
-            'TARGETING...',
-            ...selectedTargets.map(t => `* ${t} TARGETED`),
-            '',
-            'COMMAND: SHALL WE BEGIN THE COUNTDOWN?',
-            ''
-          ]);
-        } else {
-          addOutput(['INVALID TARGETS. PLEASE TRY AGAIN:', '']);
-        }
-        break;
+        case 'launch':
+          const targetIndices = input.split(',').map((n) => parseInt(n.trim()) - 1);
+          const selectedTargets = targetIndices
+            .filter((i) => i >= 0 && i < gameState.targets.length)
+            .map((i) => gameState.targets[i]);
 
-      case 'simulation':
-        if (input === 'YES' || input === 'Y') {
-          addOutput([
-            '',
-            'INITIATING COUNTDOWN...',
-            '',
-            '*** SIMULATION ACTIVATED ***',
-            '',
-            'WARNING: THE ONLY WINNING MOVE IS NOT TO PLAY.',
-            '',
-            'HOW ABOUT A NICE GAME OF CHESS?',
-            ''
-          ]);
-        } else if (input === 'NO' || input === 'N') {
-          addOutput([
-            '',
-            'WISE CHOICE.',
-            '',
-            'REMEMBER: THE ONLY WINNING MOVE IS NOT TO PLAY.',
-            '',
-            'HOW ABOUT A NICE GAME OF CHESS?',
-            ''
-          ]);
-        }
-        break;
-    }
-  }, [gameState.stage, gameState.targets, addOutput, toggleTerminal]);
+          if (selectedTargets.length > 0) {
+            setGameState((prev) => ({
+              ...prev,
+              stage: 'simulation',
+              selectedTargets,
+            }));
+            addOutput([
+              '',
+              'TARGETING...',
+              ...selectedTargets.map((t) => `* ${t} TARGETED`),
+              '',
+              'COMMAND: SHALL WE BEGIN THE COUNTDOWN?',
+              '',
+            ]);
+          } else {
+            addOutput(['INVALID TARGETS. PLEASE TRY AGAIN:', '']);
+          }
+          break;
 
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      const input = gameState.input.trim().toUpperCase();
-      handleInput(input);
-    } else if (e.key === 'Backspace') {
-      setGameState(prev => ({
-        ...prev,
-        input: prev.input.slice(0, -1)
-      }));
-    } else if (e.key.length === 1) {
-      setGameState(prev => ({
-        ...prev,
-        input: prev.input + e.key
-      }));
-    }
-  }, [gameState.input, handleInput]);
+        case 'simulation':
+          if (input === 'YES' || input === 'Y') {
+            addOutput([
+              '',
+              'INITIATING COUNTDOWN...',
+              '',
+              '*** SIMULATION ACTIVATED ***',
+              '',
+              'WARNING: THE ONLY WINNING MOVE IS NOT TO PLAY.',
+              '',
+              'HOW ABOUT A NICE GAME OF CHESS?',
+              '',
+            ]);
+          } else if (input === 'NO' || input === 'N') {
+            addOutput([
+              '',
+              'WISE CHOICE.',
+              '',
+              'REMEMBER: THE ONLY WINNING MOVE IS NOT TO PLAY.',
+              '',
+              'HOW ABOUT A NICE GAME OF CHESS?',
+              '',
+            ]);
+          }
+          break;
+      }
+    },
+    [gameState.stage, gameState.targets, addOutput, toggleTerminal]
+  );
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        const input = gameState.input.trim().toUpperCase();
+        handleInput(input);
+      } else if (e.key === 'Backspace') {
+        setGameState((prev) => ({
+          ...prev,
+          input: prev.input.slice(0, -1),
+        }));
+      } else if (e.key.length === 1) {
+        setGameState((prev) => ({
+          ...prev,
+          input: prev.input + e.key,
+        }));
+      }
+    },
+    [gameState.input, handleInput]
+  );
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -200,12 +212,12 @@ export default function WarGamesTerminal() {
   }, [handleKeyDown]);
 
   const content = (
-    <div 
+    <div
       ref={contentRef}
       className="font-mono text-green-400 p-4 overflow-hidden"
       style={{
         scrollbarColor: 'rgba(255,255,255,0.2) transparent',
-        scrollbarWidth: 'thin'
+        scrollbarWidth: 'thin',
       }}
     >
       <div className="flex flex-col">
@@ -224,12 +236,8 @@ export default function WarGamesTerminal() {
   );
 
   return (
-    <TerminalWindow
-      isGameTerminal
-      onClose={toggleTerminal}
-      terminalId="wargames"
-    >
+    <TerminalWindow isGameTerminal onClose={toggleTerminal} terminalId="wargames">
       {content}
     </TerminalWindow>
   );
-} 
+}

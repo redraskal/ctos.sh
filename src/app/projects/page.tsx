@@ -1,6 +1,6 @@
-import ClientTerminal from "@/app/components/ClientTerminal";
-import Projects from "@/app/components/Sections/Projects";
-import { PROJECTS } from "@/data/profile";
+import ClientTerminal from '@/app/components/ClientTerminal';
+import Projects from '@/app/components/Sections/Projects';
+import { PROJECTS } from '@/data/profile';
 
 export default function ProjectsPage() {
   return (
@@ -8,4 +8,4 @@ export default function ProjectsPage() {
       <Projects projects={PROJECTS} />
     </ClientTerminal>
   );
-} 
+}

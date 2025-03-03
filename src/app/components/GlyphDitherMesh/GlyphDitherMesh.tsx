@@ -2,8 +2,7 @@
 
 import { useMemo } from 'react';
 import { ClampToEdgeWrapping, Color, LinearFilter, TextureLoader, type ColorRepresentation, Vector2 } from 'three';
-import { SmartMesh } from '../SmartMesh';
-import type { SmartMeshProps } from '../SmartMesh/SmartMesh';
+import SmartMesh, { type SmartMeshProps } from '@/app/components/SmartMesh';
 import { useLoader } from '@react-three/fiber';
 
 export type GlyphDitherProps = {
@@ -83,8 +82,8 @@ const fragmentShader = `
 `;
 
 export default function GlyphDither({
-  color = "#0066ff",
-  backgroundColor = "#000000",
+  color = '#0066ff',
+  backgroundColor = '#000000',
   whirlFactor = 0.1,
   timeFactor = 0.1,
   center = [0.5, 0.5],
@@ -94,21 +93,24 @@ export default function GlyphDither({
   seed = 1002,
   ...delegated
 }: GlyphDitherProps) {
-  const glyphAtlasTexture = useLoader(TextureLoader, "/atlas.png");
+  const glyphAtlasTexture = useLoader(TextureLoader, '/atlas.png');
   glyphAtlasTexture.wrapS = ClampToEdgeWrapping;
   glyphAtlasTexture.wrapT = ClampToEdgeWrapping;
   glyphAtlasTexture.minFilter = LinearFilter;
   glyphAtlasTexture.magFilter = LinearFilter;
 
-  const uniforms = useMemo(() => ({
-    color: { value: new Color(color) },
-    backgroundColor: { value: new Color(backgroundColor) },
-    glyphAtlasTexture: { value: glyphAtlasTexture },
-    whirlFactor: { value: whirlFactor },
-    timeFactor: { value: timeFactor },
-    center: { value: new Vector2(...center) },
-    gridSize: { value: gridSize },
-  }), [color, backgroundColor, glyphAtlasTexture, whirlFactor, timeFactor, center, gridSize]);
+  const uniforms = useMemo(
+    () => ({
+      color: { value: new Color(color) },
+      backgroundColor: { value: new Color(backgroundColor) },
+      glyphAtlasTexture: { value: glyphAtlasTexture },
+      whirlFactor: { value: whirlFactor },
+      timeFactor: { value: timeFactor },
+      center: { value: new Vector2(...center) },
+      gridSize: { value: gridSize },
+    }),
+    [color, backgroundColor, glyphAtlasTexture, whirlFactor, timeFactor, center, gridSize]
+  );
 
   return (
     <SmartMesh

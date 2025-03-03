@@ -27,9 +27,7 @@ const TerminalPositionContext = createContext<TerminalPositionContextType>({
 export function TerminalPositionProvider({ children }: { children: ReactNode }) {
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
   return (
-    <TerminalPositionContext.Provider value={{ position, setPosition }}>
-      {children}
-    </TerminalPositionContext.Provider>
+    <TerminalPositionContext.Provider value={{ position, setPosition }}>{children}</TerminalPositionContext.Provider>
   );
 }
 
@@ -38,19 +36,17 @@ export function useTerminalPosition() {
 }
 
 export function MeshProvider({ children }: { children: ReactNode }) {
-  const [meshColor, setMeshColor] = useState("#c7c7c7");
+  const [meshColor, setMeshColor] = useState('#c7c7c7');
   const [timeFactor, setTimeFactor] = useState(0.2);
 
   const handleHalClick = () => {
-    setMeshColor(prev => prev === "#c7c7c7" ? "#ff0000" : "#c7c7c7");
-    setTimeFactor(prev => prev * -1);
+    setMeshColor((prev) => (prev === '#c7c7c7' ? '#ff0000' : '#c7c7c7'));
+    setTimeFactor((prev) => prev * -1);
   };
 
   return (
     <MeshContext.Provider value={{ meshColor, timeFactor, handleHalClick }}>
-      <TerminalPositionProvider>
-        {children}
-      </TerminalPositionProvider>
+      <TerminalPositionProvider>{children}</TerminalPositionProvider>
     </MeshContext.Provider>
   );
 }
@@ -61,4 +57,4 @@ export function useMesh() {
     throw new Error('useMesh must be used within a MeshProvider');
   }
   return context;
-} 
+}

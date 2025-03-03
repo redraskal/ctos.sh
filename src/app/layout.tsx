@@ -1,16 +1,12 @@
 import { metadata } from './metadata';
-import { berkeleyMono, inter } from "./fonts";
-import ClientWrapper from './components/ClientWrapper';
-import "./globals.css";
+import { berkeleyMono, inter } from './fonts';
+import ClientWrapper from '@/app/components/ClientWrapper';
+import './globals.css';
 import { Providers } from './providers';
 
 export { metadata };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${berkeleyMono.variable}`}>
       <body className="bg-black text-white antialiased">

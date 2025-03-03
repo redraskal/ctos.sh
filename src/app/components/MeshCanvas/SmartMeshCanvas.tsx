@@ -16,11 +16,11 @@ type SmartMeshCanvasProps = {
   culling?: boolean;
 } & Omit<ComponentProps<'div'>, 'mesh'>;
 
-export default function SmartMeshCanvas({ 
-  mesh: MeshComponent, 
-  meshProps = {}, 
+export default function SmartMeshCanvas({
+  mesh: MeshComponent,
+  meshProps = {},
   culling = false,
-  ...delegated 
+  ...delegated
 }: SmartMeshCanvasProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   const isObserved = useIsObserved(ref);
@@ -28,12 +28,7 @@ export default function SmartMeshCanvas({
 
   return (
     <div {...delegated} className="absolute inset-0 mx-0">
-      <Canvas
-        camera={{ position: [0, 0, 0], fov: 75 }}
-        dpr={[1, 2]}
-        ref={ref}
-        className={delegated.className}
-      >
+      <Canvas camera={{ position: [0, 0, 0], fov: 75 }} dpr={[1, 2]} ref={ref} className={delegated.className}>
         <Suspense fallback={null}>
           <MeshComponent shouldRender={shouldRender} {...meshProps} />
         </Suspense>

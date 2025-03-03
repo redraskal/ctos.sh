@@ -1,15 +1,13 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { MeshProvider } from './contexts/MeshContext';
-import { TerminalProvider } from './contexts/TerminalContext';
+import { MeshProvider } from '@/app/contexts/MeshContext';
+import { TerminalProvider } from '@/app/contexts/TerminalContext';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <MeshProvider>
-      <TerminalProvider>
-        {children}
-      </TerminalProvider>
+      <TerminalProvider>{children}</TerminalProvider>
     </MeshProvider>
   );
-} 
+}

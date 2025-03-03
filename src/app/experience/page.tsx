@@ -1,6 +1,6 @@
-import ClientTerminal from "@/app/components/ClientTerminal";
-import Experience from "@/app/components/Sections/Experience";
-import { EXPERIENCE } from "@/data/profile";
+import ClientTerminal from '@/app/components/ClientTerminal';
+import Experience from '@/app/components/Sections/Experience';
+import { EXPERIENCE } from '@/data/profile';
 
 export default function ExperiencePage() {
   return (
@@ -8,4 +8,4 @@ export default function ExperiencePage() {
       <Experience experience={EXPERIENCE} />
     </ClientTerminal>
   );
-} 
+}

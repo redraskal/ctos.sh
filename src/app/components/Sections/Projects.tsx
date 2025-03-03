@@ -21,10 +21,9 @@ export default function Projects({ projects }: ProjectsProps) {
           <div key={index} className="mb-8">
             <h4 className="font-bold text-white text-lg break-words">
               {project.githubUrl ? (
-                <a 
+                <a
                   href={project.githubUrl}
                   target="_blank"
-                  rel="noopener noreferrer"
                   className="hover:text-white/80 transition-colors inline-flex items-center"
                 >
                   <span className="break-all">{project.title}</span>
@@ -35,7 +34,7 @@ export default function Projects({ projects }: ProjectsProps) {
               )}
             </h4>
             <p className="leading-relaxed mb-4 text-white max-w-3xl">{project.description}</p>
-            
+
             {project.tags && (
               <div className="flex flex-wrap gap-2 mb-4">
                 {project.tags.map((tag, tagIndex) => (
@@ -45,10 +44,8 @@ export default function Projects({ projects }: ProjectsProps) {
                 ))}
               </div>
             )}
-            
-            {project.githubUrl && (
-              <CopyButton text={`git clone ${project.githubUrl}.git`} />
-            )}
+
+            {project.githubUrl && <CopyButton text={`git clone ${project.githubUrl}.git`} />}
           </div>
         ))}
       </div>

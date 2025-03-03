@@ -1,8 +1,8 @@
 'use client';
 
 import { ReactNode } from 'react';
-import TerminalWindow from "./TerminalWindow/TerminalWindow";
-import { useMesh } from '../contexts/MeshContext';
+import TerminalWindow from '@/app/components/TerminalWindow';
+import { useMesh } from '@/app/contexts/MeshContext';
 
 export default function ClientTerminal({ children }: { children: ReactNode }) {
   const { handleHalClick } = useMesh();
@@ -10,10 +10,8 @@ export default function ClientTerminal({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex items-center justify-center p-0 sm:p-8">
       <TerminalWindow onHalClick={handleHalClick} terminalId="main">
-        <div className="p-4 sm:p-8">
-          {children}
-        </div>
+        <div className="p-4 sm:p-8">{children}</div>
       </TerminalWindow>
     </div>
   );
-} 
+}

@@ -20,14 +20,12 @@ export default function CopyButton({ text }: CopyButtonProps) {
   };
 
   return (
-    <button 
+    <button
       onClick={copyToClipboard}
       className="text-white hover:text-white/80 transition-colors text-sm flex items-center gap-2 mt-3 cursor-pointer"
     >
       <span className="font-mono">{text}</span>
-      <span className="text-xs">
-        {copied ? '(Copied!)' : '(Click to copy)'}
-      </span>
+      <span className="text-xs">{copied ? '(Copied!)' : '(Click to copy)'}</span>
     </button>
   );
-} 
+}
