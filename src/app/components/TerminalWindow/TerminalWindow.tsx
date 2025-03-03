@@ -499,6 +499,7 @@ export default function TerminalWindow({
                       rounded-sm
                       transition-all duration-200
                       whitespace-nowrap
+                      pointer-events-auto
                       ${isCurrentPath ? 
                         'bg-white/20 text-white shadow-[inset_0_0_10px_rgba(255,255,255,0.2)] opacity-50' : 
                         'bg-black/50 text-white/70 hover:bg-white/10 hover:text-white cursor-pointer'
