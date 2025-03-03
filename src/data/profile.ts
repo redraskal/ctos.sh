@@ -13,6 +13,18 @@ export const PROJECTS = [
     tags: ["Reverse Engineering", "Binary Analysis", "Go"],
     githubUrl: "https://github.com/redraskal/r6-dissect"
   },
+  {
+    title: "CLIPS",
+    description: "Self-hosted video game clips website.",
+    tags: ["TypeScript", "Bun", "Monolith", "FFmpeg", "SQLite"],
+    githubUrl: "https://github.com/redraskal/clips"
+  },
+  {
+    title: "THIS WEBSITE",
+    description: "My personal website, hosted on Vercel.",
+    tags: ["TypeScript", "Next.js", "tailwindcss", "@react-three/fiber"],
+    githubUrl: "https://github.com/redraskal/ctos.sh"
+  },
 ];
 
 export const EXPERIENCE = [
