@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useState, useRef, useEffect } from 'react';
+import { ReactNode, useRef, useEffect, useReducer } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useTerminal } from '@/app/contexts/TerminalContext';
 import TerminalEffects from '@/app/components/TerminalEffects';
@@ -8,6 +8,7 @@ import { NAV_ITEMS } from './TerminalWindow.constants';
 import { CodeEditorContent } from './CodeEditorContent';
 import { Control } from './Control';
 import { Title } from './Title';
+import { ResizeHandles } from './ResizeHandles';
 
 interface TerminalWindowProps {
   children: ReactNode;
@@ -20,9 +21,48 @@ interface TerminalWindowProps {
   terminalId: string;
 }
 
-interface Size {
-  width: number;
-  height: number;
+interface TerminalState {
+  isDragging: boolean;
+  isResizing: boolean;
+  resizeDirection: string;
+  dragStart: { x: number; y: number };
+  size: { width: number; height: number };
+  isMobile: boolean;
+}
+
+type TerminalAction =
+  | { type: 'START_DRAG'; payload: { x: number; y: number } }
+  | { type: 'STOP_DRAG' }
+  | { type: 'START_RESIZE'; payload: { direction: string; x: number; y: number } }
+  | { type: 'STOP_RESIZE' }
+  | { type: 'UPDATE_SIZE'; payload: { width: number; height: number } }
+  | { type: 'UPDATE_DRAG'; payload: { x: number; y: number } }
+  | { type: 'SET_MOBILE'; payload: boolean };
+
+function reducer(state: TerminalState, action: TerminalAction): TerminalState {
+  switch (action.type) {
+    case 'START_DRAG':
+      return { ...state, isDragging: true, dragStart: action.payload };
+    case 'STOP_DRAG':
+      return { ...state, isDragging: false };
+    case 'START_RESIZE':
+      return {
+        ...state,
+        isResizing: true,
+        resizeDirection: action.payload.direction,
+        dragStart: { x: action.payload.x, y: action.payload.y },
+      };
+    case 'STOP_RESIZE':
+      return { ...state, isResizing: false, resizeDirection: '' };
+    case 'UPDATE_SIZE':
+      return { ...state, size: action.payload };
+    case 'UPDATE_DRAG':
+      return { ...state, dragStart: action.payload };
+    case 'SET_MOBILE':
+      return { ...state, isMobile: action.payload };
+    default:
+      return state;
+  }
 }
 
 export default function TerminalWindow({
@@ -34,17 +74,25 @@ export default function TerminalWindow({
   onClose,
   terminalId,
 }: TerminalWindowProps) {
-  const [isDragging, setIsDragging] = useState(false);
-  const [isResizing, setIsResizing] = useState(false);
-  const [resizeDirection, setResizeDirection] = useState<string>('');
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [size, setSize] = useState<Size>(() => ({
-    width: typeof window !== 'undefined' ? (window.innerWidth < 768 ? window.innerWidth : 1024) : 1024,
-    height:
-      typeof window !== 'undefined' ? (window.innerWidth < 768 ? window.innerHeight : isGameTerminal ? 600 : 700) : 700,
-  }));
-  // TODO: just remove this so call depth isn't an issue
-  const [isMobile, setIsMobile] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
+  const [state, dispatch] = useReducer(reducer, {
+    isDragging: false,
+    isResizing: false,
+    resizeDirection: '',
+    dragStart: { x: 0, y: 0 },
+    size: {
+      width: typeof window !== 'undefined' ? (window.innerWidth < 768 ? window.innerWidth : 1024) : 1024,
+      height:
+        typeof window !== 'undefined'
+          ? window.innerWidth < 768
+            ? window.innerHeight
+            : isGameTerminal
+              ? 600
+              : 700
+          : 700,
+    },
+    isMobile: typeof window !== 'undefined' ? window.innerWidth < 768 : false,
+  });
+
   const isInitialized = useRef(false);
   const terminalRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -59,22 +107,13 @@ export default function TerminalWindow({
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
-
-      if (isMobile !== mobile) {
-        setIsMobile(mobile);
-      }
+      dispatch({ type: 'SET_MOBILE', payload: mobile });
 
       if (mobile) {
-        setSize({
-          width: window.innerWidth,
-          height: window.innerHeight,
-        });
+        dispatch({ type: 'UPDATE_SIZE', payload: { width: window.innerWidth, height: window.innerHeight } });
         updateTerminalPosition(terminalId, { x: 0, y: 0 });
       } else if (!isInitialized.current) {
-        setSize({
-          width: 1024,
-          height: isGameTerminal ? 600 : 700,
-        });
+        dispatch({ type: 'UPDATE_SIZE', payload: { width: 1024, height: isGameTerminal ? 600 : 700 } });
       }
     };
 
@@ -83,7 +122,7 @@ export default function TerminalWindow({
     isInitialized.current = true;
 
     return () => window.removeEventListener('resize', handleResize);
-  }, [isMobile, terminalId, isGameTerminal, updateTerminalPosition]);
+  }, [terminalId, isGameTerminal, updateTerminalPosition]);
 
   // Remove tilde key handler since it's now handled globally
   useEffect(() => {
@@ -106,67 +145,37 @@ export default function TerminalWindow({
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging && !isResizing) return;
+      if (!state.isDragging && !state.isResizing) return;
 
-      if (isDragging) {
-        const deltaX = e.clientX - dragStart.x;
-        const deltaY = e.clientY - dragStart.y;
+      if (state.isDragging) {
+        const deltaX = e.clientX - state.dragStart.x;
+        const deltaY = e.clientY - state.dragStart.y;
 
         updateTerminalPosition(terminalId, {
           x: position.x + deltaX,
           y: position.y + deltaY,
         });
 
-        setDragStart({ x: e.clientX, y: e.clientY });
+        dispatch({ type: 'UPDATE_DRAG', payload: { x: e.clientX, y: e.clientY } });
       }
 
-      if (isResizing) {
-        const deltaX = e.clientX - dragStart.x;
-        const deltaY = e.clientY - dragStart.y;
+      if (state.isResizing) {
+        const deltaX = e.clientX - state.dragStart.x;
+        const deltaY = e.clientY - state.dragStart.y;
 
-        setDragStart({ x: e.clientX, y: e.clientY });
+        dispatch({ type: 'UPDATE_DRAG', payload: { x: e.clientX, y: e.clientY } });
 
-        setSize((prevSize) => {
-          const newSize = { ...prevSize };
-
-          if (resizeDirection.includes('e')) {
-            newSize.width = Math.max(400, prevSize.width + deltaX);
-          }
-          if (resizeDirection.includes('s')) {
-            newSize.height = Math.max(300, prevSize.height + deltaY);
-          }
-          if (resizeDirection.includes('w')) {
-            const newWidth = Math.max(400, prevSize.width - deltaX);
-            if (newWidth !== prevSize.width) {
-              updateTerminalPosition(terminalId, {
-                ...position,
-                x: position.x + (prevSize.width - newWidth),
-              });
-              newSize.width = newWidth;
-            }
-          }
-          if (resizeDirection.includes('n')) {
-            const newHeight = Math.max(300, prevSize.height - deltaY);
-            if (newHeight !== prevSize.height) {
-              updateTerminalPosition(terminalId, {
-                ...position,
-                y: position.y + (prevSize.height - newHeight),
-              });
-              newSize.height = newHeight;
-            }
-          }
-
-          return newSize;
+        dispatch({
+          type: 'UPDATE_SIZE',
+          payload: {
+            width: Math.max(400, state.size.width + (state.resizeDirection.includes('e') ? deltaX : 0)),
+            height: Math.max(300, state.size.height + (state.resizeDirection.includes('s') ? deltaY : 0)),
+          },
         });
       }
     };
 
-    const handleMouseUp = () => {
-      setIsDragging(false);
-      setIsResizing(false);
-    };
-
-    if (isDragging || isResizing) {
+    if (state.isDragging || state.isResizing) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     }
@@ -175,84 +184,41 @@ export default function TerminalWindow({
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [
-    isDragging,
-    isResizing,
-    dragStart,
-    position,
-    position.x,
-    position.y,
-    updateTerminalPosition,
-    terminalId,
-    resizeDirection,
-  ]);
+  }, [state, position, updateTerminalPosition, terminalId]);
+
+  const handleMouseUp = () => {
+    dispatch({ type: 'STOP_DRAG' });
+    dispatch({ type: 'STOP_RESIZE' });
+  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (terminalRef.current && e.target === terminalRef.current.querySelector('.terminal-title-bar')) {
-      setIsDragging(true);
-      setDragStart({ x: e.clientX, y: e.clientY });
+      dispatch({ type: 'START_DRAG', payload: { x: e.clientX, y: e.clientY } });
       bringToFront(terminalId);
     }
   };
 
   const handleResizeStart = (e: React.MouseEvent, direction: string) => {
     e.stopPropagation();
-    setIsResizing(true);
-    setResizeDirection(direction);
-    setDragStart({ x: e.clientX, y: e.clientY });
+    dispatch({ type: 'START_RESIZE', payload: { direction, x: e.clientX, y: e.clientY } });
   };
 
   return (
     <div
       ref={terminalRef}
-      className={`font-mono ${isMobile ? 'fixed inset-0' : ''}`}
+      className={`font-mono ${state.isMobile ? 'fixed inset-0' : ''}`}
       style={{
-        transform: isMobile ? 'none' : `translate(${position.x}px, ${position.y}px)`,
-        transition: isDragging || isResizing ? 'none' : 'transform 0.1s ease-out',
+        transform: state.isMobile ? 'none' : `translate(${position.x}px, ${position.y}px)`,
+        transition: state.isDragging || state.isResizing ? 'none' : 'transform 0.1s ease-out',
         zIndex: terminalStates[terminalId].zIndex,
-        width: size.width,
-        height: size.height,
+        width: state.size.width,
+        height: state.size.height,
       }}
-      onMouseDown={!isMobile ? handleMouseDown : undefined}
+      onMouseDown={!state.isMobile ? handleMouseDown : undefined}
       suppressHydrationWarning
     >
       {/* resize handles for large screens */}
-      {!isMobile && (
-        <>
-          <div
-            className="absolute -right-1 -bottom-1 w-4 h-4 cursor-se-resize z-50"
-            onMouseDown={(e) => handleResizeStart(e, 'se')}
-          />
-          <div
-            className="absolute -left-1 -bottom-1 w-4 h-4 cursor-sw-resize z-50"
-            onMouseDown={(e) => handleResizeStart(e, 'sw')}
-          />
-          <div
-            className="absolute -right-1 -top-1 w-4 h-4 cursor-ne-resize z-50"
-            onMouseDown={(e) => handleResizeStart(e, 'ne')}
-          />
-          <div
-            className="absolute -left-1 -top-1 w-4 h-4 cursor-nw-resize z-50"
-            onMouseDown={(e) => handleResizeStart(e, 'nw')}
-          />
-          <div
-            className="absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-8 cursor-e-resize z-50"
-            onMouseDown={(e) => handleResizeStart(e, 'e')}
-          />
-          <div
-            className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-8 cursor-w-resize z-50"
-            onMouseDown={(e) => handleResizeStart(e, 'w')}
-          />
-          <div
-            className="absolute top-[-1px] left-1/2 -translate-x-1/2 h-2 w-8 cursor-n-resize z-50"
-            onMouseDown={(e) => handleResizeStart(e, 'n')}
-          />
-          <div
-            className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-2 w-8 cursor-s-resize z-50"
-            onMouseDown={(e) => handleResizeStart(e, 's')}
-          />
-        </>
-      )}
+      {!state.isMobile && <ResizeHandles handleResizeStart={handleResizeStart} />}
 
       {/* terminal frame */}
       <div
@@ -276,7 +242,7 @@ export default function TerminalWindow({
           px-4 py-2
           bg-gradient-to-r from-white/10 via-white/5 to-white/10
           border-b-2 border-white/20
-          ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''}
+          ${!state.isMobile ? 'cursor-grab active:cursor-grabbing' : ''}
           select-none
         `}
         >
@@ -350,7 +316,7 @@ export default function TerminalWindow({
               {NAV_ITEMS.map((item) => {
                 const isCurrentPath = pathname === item.path;
 
-                if (!isMobile) {
+                if (!state.isMobile) {
                   return (
                     <button
                       key={item.path}
@@ -371,7 +337,7 @@ export default function TerminalWindow({
                       `}
                     >
                       <span className="mr-2">{item.label}</span>
-                      {!isMobile && <span className="text-white/30">[{item.shortcut}]</span>}
+                      {!state.isMobile && <span className="text-white/30">[{item.shortcut}]</span>}
                     </button>
                   );
                 } else {
