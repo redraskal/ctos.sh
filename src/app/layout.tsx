@@ -4,6 +4,7 @@ import ClientWrapper from '@/app/components/ClientWrapper';
 import './globals.css';
 import { Providers } from './providers';
 import Analytics from '@/app/components/Analytics';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export { metadata };
 
@@ -15,6 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ClientWrapper>{children}</ClientWrapper>
         </Providers>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
