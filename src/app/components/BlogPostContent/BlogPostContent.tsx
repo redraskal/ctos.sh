@@ -185,7 +185,7 @@ export default function BlogPostContent({ children }: BlogPostContentProps) {
   }, [state.showFocusIndicator, state.isKeyboardMode]);
 
   return (
-    <div ref={contentRef} className="blog-post-content-wrapper relative" tabIndex={-1}>
+    <div ref={contentRef} className="relative" tabIndex={-1}>
       {children}
     </div>
   );

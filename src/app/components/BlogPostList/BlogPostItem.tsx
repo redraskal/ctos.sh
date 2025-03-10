@@ -141,7 +141,7 @@ export function BlogPostItem({
 
         <div
           className={`
-          font-mono text-sm transition-opacity duration-150 relative z-10 select-none
+          font-mono text-sm transition-opacity duration-150 relative z-10 select-none hidden md:block
           ${isClient && selectedIndex === index ? 'opacity-100' : 'opacity-50'}
           ${isClient && selectedIndex === index && isPressing && pressProgress > 0.5 ? 'text-white' : 'text-black'}
         `}

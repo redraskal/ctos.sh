@@ -14,7 +14,7 @@ export default function PageBackground({ children, className = '' }: PageBackgro
         backgroundRepeat: 'repeat',
       }}
     >
-      <article className="py-20 px-6 relative flex-grow flex items-stretch">
+      <article className="py-10 sm:py-20 px-4 sm:px-6 relative flex-grow flex items-stretch">
         <div className="max-w-6xl mx-auto relative md:p-5 w-full flex flex-col">{children}</div>
       </article>
     </main>
