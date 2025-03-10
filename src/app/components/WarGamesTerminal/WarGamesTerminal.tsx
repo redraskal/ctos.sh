@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useWarGames } from '@/app/contexts/WarGamesContext';
+import { useWarGames } from '@/app/(terminal)/contexts/WarGamesContext';
 import TerminalWindow from '@/app/components/TerminalWindow';
 
 interface GameState {

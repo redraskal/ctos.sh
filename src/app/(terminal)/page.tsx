@@ -3,7 +3,7 @@
 import TerminalWindow from '@/app/components/TerminalWindow';
 import About from '@/app/components/Sections/About';
 import { ABOUT_TEXT } from '@/data/profile';
-import { useMesh } from '@/app/contexts/MeshContext';
+import { useMesh } from '@/app/(terminal)/contexts/MeshContext';
 
 export default function Home() {
   const { handleHalClick } = useMesh();
