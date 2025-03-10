@@ -22,8 +22,8 @@ export default async function BlogPage() {
             <div className="relative z-10 before:absolute before:inset-0 before:bg-[url('/atlas_blog.png')] before:bg-repeat before:opacity-10 before:dark:opacity-5 before:-z-10">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter mb-6">ctos.sh - Blog</h1>
               <p>
-                Hey, I&apos;m Ben! Welcome to my blog! I write about web development, technology, and other topics I&apos;m
-                passionate about.
+                Hey, I&apos;m Ben! Welcome to my blog! I write about web development, technology, and other topics
+                I&apos;m passionate about.
               </p>
             </div>
 

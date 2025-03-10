@@ -1,6 +1,4 @@
-export const ABOUT_TEXT = `Hi, I'm Ben! A software engineer with a passion for technology and problem-solving.
-
-My current interests include full-stack development, security research/tooling, and developer tooling.
+export const ABOUT_TEXT = `I'm Ben! A software engineer with an interest in full-stack development, security research/tooling, and developer tooling.
 
 I live in St. Louis, Missouri, USA.
 
