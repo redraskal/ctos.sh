@@ -94,6 +94,12 @@ export default function TerminalWindow({
 
   const isInitialized = useRef(false);
   const terminalRef = useRef<HTMLDivElement>(null);
+  const isMobileRef = useRef(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+  const sizeRef = useRef({
+    width: typeof window !== 'undefined' ? (window.innerWidth < 768 ? window.innerWidth : 1024) : 1024,
+    height:
+      typeof window !== 'undefined' ? (window.innerWidth < 768 ? window.innerHeight : isGameTerminal ? 600 : 700) : 700,
+  });
   const router = useRouter();
   const pathname = usePathname();
   const { terminalStates, updateTerminalPosition, bringToFront } = useTerminal();
@@ -106,13 +112,31 @@ export default function TerminalWindow({
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
-      dispatch({ type: 'SET_MOBILE', payload: mobile });
+      const mobileChanged = mobile !== isMobileRef.current;
+
+      if (mobileChanged) {
+        isMobileRef.current = mobile;
+        dispatch({ type: 'SET_MOBILE', payload: mobile });
+      }
 
       if (mobile) {
-        dispatch({ type: 'UPDATE_SIZE', payload: { width: window.innerWidth, height: window.innerHeight } });
-        updateTerminalPosition(terminalId, { x: 0, y: 0 });
+        const newWidth = window.innerWidth;
+        const newHeight = window.innerHeight;
+
+        if (sizeRef.current.width !== newWidth || sizeRef.current.height !== newHeight) {
+          sizeRef.current = { width: newWidth, height: newHeight };
+          dispatch({ type: 'UPDATE_SIZE', payload: { width: newWidth, height: newHeight } });
+        }
+
+        if (mobileChanged) {
+          updateTerminalPosition(terminalId, { x: 0, y: 0 });
+        }
       } else if (!isInitialized.current) {
-        dispatch({ type: 'UPDATE_SIZE', payload: { width: 1024, height: isGameTerminal ? 600 : 700 } });
+        const newWidth = 1024;
+        const newHeight = isGameTerminal ? 600 : 700;
+
+        sizeRef.current = { width: newWidth, height: newHeight };
+        dispatch({ type: 'UPDATE_SIZE', payload: { width: newWidth, height: newHeight } });
       }
     };
 
@@ -162,15 +186,19 @@ export default function TerminalWindow({
         const deltaX = e.clientX - state.dragStart.x;
         const deltaY = e.clientY - state.dragStart.y;
 
-        dispatch({ type: 'UPDATE_DRAG', payload: { x: e.clientX, y: e.clientY } });
+        const newWidth = Math.max(400, state.size.width + (state.resizeDirection.includes('e') ? deltaX : 0));
+        const newHeight = Math.max(300, state.size.height + (state.resizeDirection.includes('s') ? deltaY : 0));
 
-        dispatch({
-          type: 'UPDATE_SIZE',
-          payload: {
-            width: Math.max(400, state.size.width + (state.resizeDirection.includes('e') ? deltaX : 0)),
-            height: Math.max(300, state.size.height + (state.resizeDirection.includes('s') ? deltaY : 0)),
-          },
-        });
+        if (newWidth !== sizeRef.current.width || newHeight !== sizeRef.current.height) {
+          sizeRef.current = { width: newWidth, height: newHeight };
+
+          dispatch({
+            type: 'UPDATE_SIZE',
+            payload: { width: newWidth, height: newHeight },
+          });
+        }
+
+        dispatch({ type: 'UPDATE_DRAG', payload: { x: e.clientX, y: e.clientY } });
       }
     };
 
@@ -183,7 +211,17 @@ export default function TerminalWindow({
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [state, position, updateTerminalPosition, terminalId]);
+  }, [
+    state.isDragging,
+    state.isResizing,
+    state.dragStart,
+    state.size.width,
+    state.size.height,
+    state.resizeDirection,
+    position,
+    updateTerminalPosition,
+    terminalId,
+  ]);
 
   const handleMouseUp = () => {
     dispatch({ type: 'STOP_DRAG' });
