@@ -16,7 +16,7 @@ However, I noticed an interesting workaround: while ad blockers target specific 
 
 Next.js provides a <a href="https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites" target="_blank">rewrites API</a> that allows us to redirect requests from one URL to another. In your `next.config.ts`, add a `rewrites` property & replace `https://www.ctos.sh` with your own domain. You can customize the `source` path to any route you prefer, just make sure it ends with `/:match*` to properly capture all nested paths from the original analytics endpoints.
 
-It's important to use an absolute URL (your production domain) rather than a relative path ('/'). Using a relative path would prevent Vercel from properly rewriting the content in the '/_vercel' directory, causing the analytics scripts to fail to load.
+It's important to use an absolute URL (your production domain) rather than a relative path ('/'). Using a relative path would prevent Vercel from properly rewriting the content in the '/\_vercel' directory, causing the analytics scripts to fail to load.
 
 ```ts filename="next.config.ts"
 import type { NextConfig } from 'next';
