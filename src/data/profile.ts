@@ -1,10 +1,10 @@
-export const ABOUT_TEXT = `Hi, I'm Ben! A software engineer with a curiosity for technology.
+export const ABOUT_TEXT = `Hi, I'm Ben! A software engineer with a passion for technology and problem-solving.
 
-My current interests include full-stack development, security, and tooling.
+My current interests include full-stack development, security research/tooling, and developer tooling.
 
-When not coding, you can find me messing around with music production in FL Studio.
+When I'm not coding, you can find me creating music in FL Studio or writing about tech on my blog.
 
-I am a huge fan of shows like Severance, Slow Horses, and Silo (the books are great too).
+I enjoy thought-provoking shows like Severance, Slow Horses, and Silo (I highly recommend the books too).
 
 PS: Try pressing ~ to access something interesting...`;
 
