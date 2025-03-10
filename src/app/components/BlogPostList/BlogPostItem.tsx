@@ -90,7 +90,8 @@ export function BlogPostItem({
         <div className="flex-1 relative z-10 select-none">
           <div
             className={`
-            font-mono text-lg font-semibold truncate select-none
+            font-mono text-lg font-semibold select-none
+            sm:truncate whitespace-normal break-words
             ${
               isClient && selectedIndex === index
                 ? isPressing && pressProgress > 0.5

@@ -10,7 +10,7 @@ export function NavButtons({ isMobile }: NavButtonsProps) {
   const pathname = usePathname();
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2 -mb-2 flex-wrap justify-center w-full md:justify-normal md:w-auto">
+    <div className="flex gap-1 md:gap-2 overflow-x-auto pb-2 -mb-2 flex-wrap justify-center w-full md:justify-normal md:w-auto">
       {NAV_ITEMS.map((item) => {
         const isCurrentPath = pathname === item.path;
 
