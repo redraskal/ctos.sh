@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 import TerminalWindow from '@/app/components/TerminalWindow';
-import { useMesh } from '@/app/contexts/MeshContext';
+import { useMesh } from '@/app/(terminal)/contexts/MeshContext';
 
 export default function ClientTerminal({ children }: { children: ReactNode }) {
   const { handleHalClick } = useMesh();

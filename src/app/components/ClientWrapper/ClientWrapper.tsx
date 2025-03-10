@@ -3,8 +3,8 @@
 import { ReactNode, useEffect } from 'react';
 import SmartMeshCanvas from '@/app/components/MeshCanvas/SmartMeshCanvas';
 import GlyphDitherMesh from '@/app/components/GlyphDitherMesh';
-import { MeshProvider, useMesh } from '@/app/contexts/MeshContext';
-import { WarGamesProvider, useWarGames } from '@/app/contexts/WarGamesContext';
+import { MeshProvider, useMesh } from '@/app/(terminal)/contexts/MeshContext';
+import { WarGamesProvider, useWarGames } from '@/app/(terminal)/contexts/WarGamesContext';
 
 function ClientContent({ children }: { children: ReactNode }) {
   const { meshColor, timeFactor } = useMesh();
@@ -45,7 +45,7 @@ function ClientContent({ children }: { children: ReactNode }) {
         ></div>
       </div>
 
-      <main className="relative">{children}</main>
+      {children}
     </>
   );
 }

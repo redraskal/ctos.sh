@@ -1,12 +1,13 @@
-import { metadata } from './metadata';
-import { berkeleyMono, inter } from './fonts';
+import { berkeleyMono, inter } from '@/app/fonts';
 import ClientWrapper from '@/app/components/ClientWrapper';
-import './globals.css';
+import '@/app/globals.css';
 import { Providers } from './providers';
 import Analytics from '@/app/components/Analytics';
-import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Metadata } from 'next';
 
-export { metadata };
+export const metadata: Metadata = {
+  title: 'Benjamin Ryan',
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -16,7 +17,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ClientWrapper>{children}</ClientWrapper>
         </Providers>
         <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );
