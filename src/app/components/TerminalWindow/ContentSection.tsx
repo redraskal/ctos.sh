@@ -7,6 +7,7 @@ interface ContentSectionProps {
   isGameTerminal?: boolean;
   defaultContent?: string;
   onContentChange?: (content: string) => void;
+  isMobile?: boolean;
 }
 
 export function ContentSection({
@@ -14,6 +15,7 @@ export function ContentSection({
   isGameTerminal = false,
   defaultContent,
   onContentChange,
+  isMobile = false,
 }: ContentSectionProps) {
   return (
     <div className="relative flex-1 flex flex-col overflow-hidden">
@@ -29,7 +31,7 @@ export function ContentSection({
         `}
       >
         {!isGameTerminal ? (
-          <CodeEditorContent defaultContent={defaultContent} onContentChange={onContentChange}>
+          <CodeEditorContent defaultContent={defaultContent} onContentChange={onContentChange} isMobile={isMobile}>
             {children}
           </CodeEditorContent>
         ) : (

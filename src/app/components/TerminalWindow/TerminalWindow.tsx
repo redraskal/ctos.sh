@@ -237,6 +237,7 @@ export default function TerminalWindow({
           isGameTerminal={isGameTerminal}
           defaultContent={defaultContent}
           onContentChange={onContentChange}
+          isMobile={state.isMobile}
         >
           {children}
         </ContentSection>

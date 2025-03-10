@@ -22,7 +22,7 @@ export function Footer({ isGameTerminal = false, isMobile, children, onHalClick 
         flex-wrap gap-2
       "
     >
-      {!isGameTerminal && onHalClick && (
+      {!isGameTerminal && !isMobile && onHalClick && (
         <div className="flex gap-3 z-10">
           <Control
             label="HAL"
