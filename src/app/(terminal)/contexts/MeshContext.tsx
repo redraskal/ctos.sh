@@ -36,11 +36,11 @@ export function useTerminalPosition() {
 }
 
 export function MeshProvider({ children }: { children: ReactNode }) {
-  const [meshColor, setMeshColor] = useState('#c7c7c7');
+  const [meshColor, setMeshColor] = useState('#a7a7a7');
   const [timeFactor, setTimeFactor] = useState(0.2);
 
   const handleHalClick = () => {
-    setMeshColor((prev) => (prev === '#c7c7c7' ? '#ff0000' : '#c7c7c7'));
+    setMeshColor((prev) => (prev === '#a7a7a7' ? '#cc0000' : '#a7a7a7'));
     setTimeFactor((prev) => prev * -1);
   };
 
