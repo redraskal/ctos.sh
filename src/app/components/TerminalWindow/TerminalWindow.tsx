@@ -101,7 +101,7 @@ export default function TerminalWindow({
 
   const title = isGameTerminal
     ? 'WOPR - THERMONUCLEAR WAR'
-    : `/var/www/html${pathname === '/' ? '/index.html' : pathname + '.html'}`;
+    : `${pathname === '/' ? '/page.tsx' : pathname + '/page.tsx'}`;
 
   useEffect(() => {
     const handleResize = () => {
@@ -123,7 +123,7 @@ export default function TerminalWindow({
     return () => window.removeEventListener('resize', handleResize);
   }, [terminalId, isGameTerminal, updateTerminalPosition]);
 
-  // Remove tilde key handler since it's now handled globally
+  // Remove tilde key handler since it's handled globally
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.altKey && !isNaN(Number(e.key))) {
