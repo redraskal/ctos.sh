@@ -12,7 +12,7 @@ While working on my website, I discovered ad blockers prevent Vercel analytics c
 
 However, I noticed an interesting workaround: while ad blockers target specific URL patterns, they don't verify file content. By rewriting the URLs that serve these analytics scripts, we can bypass these restrictions. Let's go :)
 
-# Step 1: Configure rewrites in next.config.ts
+## Step 1: Configure rewrites in next.config.ts
 
 Next.js provides a <a href="https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites" target="_blank">rewrites API</a> that allows us to redirect requests from one URL to another. In your `next.config.ts`, add a `rewrites` property & replace `https://www.ctos.sh` with your own domain. You can customize the `source` path to any route you prefer, just make sure it ends with `/:match*` to properly capture all nested paths from the original analytics endpoints.
 
