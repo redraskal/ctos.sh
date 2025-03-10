@@ -2,9 +2,7 @@ export const ABOUT_TEXT = `Hi, I'm Ben! A software engineer with a passion for t
 
 My current interests include full-stack development, security research/tooling, and developer tooling.
 
-When I'm not coding, you can find me creating music in FL Studio or writing about tech on my blog.
-
-I enjoy thought-provoking shows like Severance, Slow Horses, and Silo (I highly recommend the books too).
+I live in St. Louis, Missouri, USA.
 
 PS: Try pressing ~ to access something interesting...`;
 
@@ -24,7 +22,7 @@ export const PROJECTS = [
   {
     title: 'THIS WEBSITE',
     description: 'My personal website, hosted on Vercel.',
-    tags: ['TypeScript', 'Next.js', 'tailwindcss', '@react-three/fiber'],
+    tags: ['TypeScript', 'Next.js', 'tailwindcss', 'MDX', '@react-three/fiber'],
     githubUrl: 'https://github.com/redraskal/ctos.sh',
   },
 ];
