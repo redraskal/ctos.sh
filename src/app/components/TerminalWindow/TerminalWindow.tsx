@@ -2,13 +2,12 @@
 
 import { ReactNode, useRef, useEffect, useReducer } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useTerminal } from '@/app/contexts/TerminalContext';
-import TerminalEffects from '@/app/components/TerminalEffects';
-import { NAV_ITEMS } from './TerminalWindow.constants';
-import { CodeEditorContent } from './CodeEditorContent';
-import { Control } from './Control';
-import { Title } from './Title';
+import { useTerminal } from '@/app/(terminal)/contexts/TerminalContext';
 import { ResizeHandles } from './ResizeHandles';
+import { TitleBar } from './TitleBar';
+import { ContentSection } from './ContentSection';
+import { Footer } from './Footer';
+import { NAV_ITEMS } from './TerminalWindow.constants';
 
 interface TerminalWindowProps {
   children: ReactNode;
@@ -95,6 +94,12 @@ export default function TerminalWindow({
 
   const isInitialized = useRef(false);
   const terminalRef = useRef<HTMLDivElement>(null);
+  const isMobileRef = useRef(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+  const sizeRef = useRef({
+    width: typeof window !== 'undefined' ? (window.innerWidth < 768 ? window.innerWidth : 1024) : 1024,
+    height:
+      typeof window !== 'undefined' ? (window.innerWidth < 768 ? window.innerHeight : isGameTerminal ? 600 : 700) : 700,
+  });
   const router = useRouter();
   const pathname = usePathname();
   const { terminalStates, updateTerminalPosition, bringToFront } = useTerminal();
@@ -102,18 +107,36 @@ export default function TerminalWindow({
 
   const title = isGameTerminal
     ? 'WOPR - THERMONUCLEAR WAR'
-    : `ben@dedsec00:/var/www/html${pathname === '/' ? '/index.html' : pathname + '.html'}`;
+    : `${pathname === '/' ? '/page.tsx' : pathname + '/page.tsx'}`;
 
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
-      dispatch({ type: 'SET_MOBILE', payload: mobile });
+      const mobileChanged = mobile !== isMobileRef.current;
+
+      if (mobileChanged) {
+        isMobileRef.current = mobile;
+        dispatch({ type: 'SET_MOBILE', payload: mobile });
+      }
 
       if (mobile) {
-        dispatch({ type: 'UPDATE_SIZE', payload: { width: window.innerWidth, height: window.innerHeight } });
-        updateTerminalPosition(terminalId, { x: 0, y: 0 });
+        const newWidth = window.innerWidth;
+        const newHeight = window.innerHeight;
+
+        if (sizeRef.current.width !== newWidth || sizeRef.current.height !== newHeight) {
+          sizeRef.current = { width: newWidth, height: newHeight };
+          dispatch({ type: 'UPDATE_SIZE', payload: { width: newWidth, height: newHeight } });
+        }
+
+        if (mobileChanged) {
+          updateTerminalPosition(terminalId, { x: 0, y: 0 });
+        }
       } else if (!isInitialized.current) {
-        dispatch({ type: 'UPDATE_SIZE', payload: { width: 1024, height: isGameTerminal ? 600 : 700 } });
+        const newWidth = 1024;
+        const newHeight = isGameTerminal ? 600 : 700;
+
+        sizeRef.current = { width: newWidth, height: newHeight };
+        dispatch({ type: 'UPDATE_SIZE', payload: { width: newWidth, height: newHeight } });
       }
     };
 
@@ -124,7 +147,7 @@ export default function TerminalWindow({
     return () => window.removeEventListener('resize', handleResize);
   }, [terminalId, isGameTerminal, updateTerminalPosition]);
 
-  // Remove tilde key handler since it's now handled globally
+  // Remove tilde key handler since it's handled globally
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.altKey && !isNaN(Number(e.key))) {
@@ -163,15 +186,19 @@ export default function TerminalWindow({
         const deltaX = e.clientX - state.dragStart.x;
         const deltaY = e.clientY - state.dragStart.y;
 
-        dispatch({ type: 'UPDATE_DRAG', payload: { x: e.clientX, y: e.clientY } });
+        const newWidth = Math.max(400, state.size.width + (state.resizeDirection.includes('e') ? deltaX : 0));
+        const newHeight = Math.max(300, state.size.height + (state.resizeDirection.includes('s') ? deltaY : 0));
 
-        dispatch({
-          type: 'UPDATE_SIZE',
-          payload: {
-            width: Math.max(400, state.size.width + (state.resizeDirection.includes('e') ? deltaX : 0)),
-            height: Math.max(300, state.size.height + (state.resizeDirection.includes('s') ? deltaY : 0)),
-          },
-        });
+        if (newWidth !== sizeRef.current.width || newHeight !== sizeRef.current.height) {
+          sizeRef.current = { width: newWidth, height: newHeight };
+
+          dispatch({
+            type: 'UPDATE_SIZE',
+            payload: { width: newWidth, height: newHeight },
+          });
+        }
+
+        dispatch({ type: 'UPDATE_DRAG', payload: { x: e.clientX, y: e.clientY } });
       }
     };
 
@@ -184,7 +211,17 @@ export default function TerminalWindow({
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [state, position, updateTerminalPosition, terminalId]);
+  }, [
+    state.isDragging,
+    state.isResizing,
+    state.dragStart,
+    state.size.width,
+    state.size.height,
+    state.resizeDirection,
+    position,
+    updateTerminalPosition,
+    terminalId,
+  ]);
 
   const handleMouseUp = () => {
     dispatch({ type: 'STOP_DRAG' });
@@ -220,7 +257,6 @@ export default function TerminalWindow({
       {/* resize handles for large screens */}
       {!state.isMobile && <ResizeHandles handleResizeStart={handleResizeStart} />}
 
-      {/* terminal frame */}
       <div
         className="
         relative
@@ -233,128 +269,18 @@ export default function TerminalWindow({
         rounded-md
       "
       >
-        {/* title bar */}
-        <div
-          className={`
-          terminal-title-bar
-          relative
-          flex items-center
-          px-4 py-2
-          bg-gradient-to-r from-white/10 via-white/5 to-white/10
-          border-b-2 border-white/20
-          ${!state.isMobile ? 'cursor-grab active:cursor-grabbing' : ''}
-          select-none
-        `}
+        <TitleBar title={title} isGameTerminal={isGameTerminal} isMobile={state.isMobile} onClose={onClose} />
+
+        <ContentSection
+          isGameTerminal={isGameTerminal}
+          defaultContent={defaultContent}
+          onContentChange={onContentChange}
+          isMobile={state.isMobile}
         >
-          {!isGameTerminal && (
-            <div className="gap-3 z-10 hidden md:flex">
-              <Control
-                label="HAL"
-                color="bg-gradient-to-r from-red-900/50 to-red-700/50"
-                pulseColor="bg-red-400"
-                onClick={onHalClick}
-              />
-            </div>
-          )}
+          {children}
+        </ContentSection>
 
-          <Title text={title} />
-
-          {isGameTerminal && (
-            <div className="flex gap-3 z-10">
-              <Control
-                label="EXIT"
-                color="bg-gradient-to-r from-red-900/50 to-red-700/50"
-                pulseColor="bg-red-400"
-                onClick={onClose}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* content */}
-        <div className="relative flex-1 flex flex-col overflow-hidden">
-          <TerminalEffects />
-
-          <div
-            className={`
-            relative flex-1
-            ${!isGameTerminal ? 'min-h-0' : 'h-auto'}
-            overflow-auto
-            shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]
-            p-4
-          `}
-          >
-            {!isGameTerminal ? (
-              <CodeEditorContent defaultContent={defaultContent} onContentChange={onContentChange}>
-                {children}
-              </CodeEditorContent>
-            ) : (
-              children
-            )}
-          </div>
-        </div>
-
-        {/* footer */}
-        <div
-          className="
-          relative
-          flex items-center justify-between
-          px-4 py-2
-          bg-gradient-to-r from-white/10 via-white/5 to-white/10
-          border-t-2 border-white/20
-          text-xs text-white/50
-          flex-wrap gap-2
-        "
-        >
-          <div className="flex items-center gap-4 flex-wrap">
-            <span>SYSTEM: READY</span>
-          </div>
-
-          {/* nav buttons */}
-          {!isGameTerminal && (
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 -mb-2 flex-wrap">
-              {NAV_ITEMS.map((item) => {
-                const isCurrentPath = pathname === item.path;
-
-                if (!state.isMobile) {
-                  return (
-                    <button
-                      key={item.path}
-                      onClick={() => !isCurrentPath && router.push(item.path)}
-                      disabled={isCurrentPath}
-                      className={`
-                        px-3 py-1
-                        border border-white/20
-                        rounded-sm
-                        transition-all duration-200
-                        whitespace-nowrap
-                        pointer-events-auto
-                        ${
-                          isCurrentPath
-                            ? 'bg-white/20 text-white shadow-[inset_0_0_10px_rgba(255,255,255,0.2)] opacity-50'
-                            : 'bg-black/50 text-white/70 hover:bg-white/10 hover:text-white cursor-pointer'
-                        }
-                      `}
-                    >
-                      <span className="mr-2">{item.label}</span>
-                      {!state.isMobile && <span className="text-white/30">[{item.shortcut}]</span>}
-                    </button>
-                  );
-                } else {
-                  return (
-                    <a
-                      href={item.path}
-                      key={item.path}
-                      className="px-3 py-1 transition-all duration-200 whitespace-nowrap"
-                    >
-                      {item.label}
-                    </a>
-                  );
-                }
-              })}
-            </div>
-          )}
-        </div>
+        <Footer isGameTerminal={isGameTerminal} isMobile={state.isMobile} onHalClick={onHalClick} />
       </div>
     </div>
   );

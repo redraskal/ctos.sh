@@ -5,10 +5,12 @@ export function CodeEditorContent({
   children,
   defaultContent,
   onContentChange,
+  isMobile,
 }: {
   children?: ReactNode;
   defaultContent?: string;
   onContentChange?: (content: string) => void;
+  isMobile?: boolean;
 }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [lineCount, setLineCount] = useState(1);
@@ -23,7 +25,7 @@ export function CodeEditorContent({
   }, [children, defaultContent]);
 
   useEffect(() => {
-    if (!contentRef.current || isEditing) return;
+    if (!contentRef.current || isEditing || isMobile) return;
 
     const makeNodesEditable = (node: Node) => {
       if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) {
@@ -38,13 +40,16 @@ export function CodeEditorContent({
     };
 
     Array.from(contentRef.current.childNodes).forEach(makeNodesEditable);
-  }, [children, isEditing]);
+  }, [children, isEditing, isMobile]);
 
   const handleInput = (e: React.FormEvent) => {
     const target = e.target as HTMLElement;
     if (!target.isContentEditable) return;
 
-    setIsEditing(true);
+    if (!isMobile) {
+      setIsEditing(true);
+    }
+
     if (contentRef.current) {
       onContentChange?.(contentRef.current.innerHTML);
     }
@@ -65,13 +70,14 @@ export function CodeEditorContent({
         ref={contentRef}
         onInput={handleInput}
         onKeyDown={handleKeyDown}
-        className="
+        className={`
             flex-1 relative font-mono leading-6
             text-white/90
             whitespace-pre-wrap
             [text-shadow:0_0_5px_rgba(255,255,255,0.3)]
             caret-white/70
-          "
+            ${isMobile ? 'text-xs' : 'text-sm'}
+          `}
       >
         {children}
       </div>

@@ -1,14 +1,14 @@
 # generates a font atlas for glyph dither effects
 from PIL import Image, ImageDraw, ImageFont
 
-glyphs = "CTOSÃÿ"
+glyphs = "░▒▓"
 glyph_size = 48 # px
 atlas_width = glyph_size * len(glyphs)
 atlas_height = glyph_size
 
 
 font_path = "../public/fonts/TX-02-Variable.woff2"
-font_size = 50  # adjust when changing fonts for proper fitting
+font_size = 57  # adjust when changing fonts for proper fitting
 font = ImageFont.truetype(font_path, font_size)
 
 atlas = Image.new("RGBA", (atlas_width, atlas_height), (0, 0, 0, 255))
@@ -27,5 +27,5 @@ for i, letter in enumerate(glyphs):
     draw.text((x_offset, y_offset), letter, font=font, fill=(255, 255, 255, 255))
     atlas.paste(char_image, (i * glyph_size, 0))
 
-atlas.save("../public/atlas.png")
+atlas.save("../public/atlas_blog.png")
 print("Atlas saved.")

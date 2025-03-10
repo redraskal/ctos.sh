@@ -1,0 +1,90 @@
+---
+title: 'Bypassing Ad Blockers for Vercel Analytics'
+date: '2025-03-09'
+excerpt: 'Bypass ad blockers for Vercel Analytics with a simple Next.js configuration.'
+author:
+  name: 'Benjamin Ryan'
+  avatar: 'https://avatars.githubusercontent.com/u/6241454?s=200'
+  url: 'https://github.com/redraskal'
+---
+
+While working on my website, I discovered ad blockers prevent Vercel analytics client scripts from loading. This is unfortunate since Vercel's analytics implementation is anonymous & lightweight.
+
+However, I noticed an interesting workaround: while ad blockers target specific URL patterns, they don't verify file content. By rewriting the URLs that serve these analytics scripts, we can bypass these restrictions. Let's go :)
+
+## Step 1: Configure rewrites in next.config.ts
+
+Next.js provides a <a href="https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites" target="_blank">rewrites API</a> that allows us to redirect requests from one URL to another. In your `next.config.ts`, add a `rewrites` property & replace `https://www.ctos.sh` with your own domain. You can customize the `source` path to any route you prefer, just make sure it ends with `/:match*` to properly capture all nested paths from the original analytics endpoints.
+
+It's important to use an absolute URL (your production domain) rather than a relative path ('/'). Using a relative path would prevent Vercel from properly rewriting the content in the '/\_vercel' directory, causing the analytics scripts to fail to load.
+
+```ts filename="next.config.ts"
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+  rewrites: async () => {
+    return [
+      {
+        source: '/science/:match*',
+        destination: 'https://www.ctos.sh/_vercel/insights/:match*',
+      },
+      {
+        source: '/perf/:match*',
+        destination: 'https://www.ctos.sh/_vercel/speed-insights/:match*',
+      },
+    ];
+  },
+};
+
+export default nextConfig;
+```
+
+## Step 2: Inject the Vercel scripts
+
+You can easily create a Component to house Web Analytics and Speed Insights. The development environment check below ensures Vercel doesn't log interactions on a local development server.
+
+If you changed your source endpoints in `next.config.ts`, be sure to update the `data-endpoint` attributes below.
+
+```tsx filename="@/app/components/Analytics.tsx"
+import Script from 'next/script';
+
+const dev = process.env.NODE_ENV === 'development';
+const insightsSrc = dev ? 'https://va.vercel-scripts.com/v1/script.debug.js' : '/science/script.js';
+const vitalsSrc = dev ? 'https://va.vercel-scripts.com/v1/speed-insights/script.debug.js' : '/perf/script.js';
+
+export default function Analytics() {
+  return (
+    <>
+      <Script src={insightsSrc} data-endpoint="/science" strategy="lazyOnload" async />
+      <Script src={vitalsSrc} data-endpoint="/perf/vitals" strategy="lazyOnload" async />
+    </>
+  );
+}
+```
+
+## Step 3: Insert the Component into your Next.js layout
+
+I'm using App Router in this example. You can insert the `<Analytics />` Component in the root layout to ensure both Web Analytics and Speed Insights are active across the site.
+
+```tsx filename="@/app/layout.tsx"
+import Analytics from '@/app/components/Analytics';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <Analytics />
+      </body>
+    </html>
+  );
+}
+```
+
+---
+
+That's it! Just like that, you can collect anonymous analytics.
+
+> **Note:** This approach doesn't support advanced Vercel features such as feature flags, custom events, or environment-specific configurations. For those capabilities, you'll need to implement the official Vercel integration or edit the `<Analytics />` Component.
+
+Funny side-note: I initially only rewrote the Web Analytics URL and noticed a pattern - analytics data came through fine, but Speed Insights data was missing on desktop. Ad blockers on desktop browsers were likely the culprit!

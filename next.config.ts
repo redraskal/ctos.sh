@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import createMDX from '@next/mdx';
 
 const nextConfig: NextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
@@ -14,8 +15,19 @@ const nextConfig: NextConfig = {
         source: '/science/:match*',
         destination: 'https://www.ctos.sh/_vercel/insights/:match*',
       },
+      {
+        source: '/perf/:match*',
+        destination: 'https://www.ctos.sh/_vercel/speed-insights/:match*',
+      },
     ];
   },
 };
 
-export default nextConfig;
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: [],
+    rehypePlugins: [],
+  },
+});
+
+export default withMDX(nextConfig);
