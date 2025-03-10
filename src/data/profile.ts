@@ -2,7 +2,7 @@ export const ABOUT_TEXT = `Hi, I'm Ben! A software engineer with a curiosity for
 
 My current interests include full-stack development, security, and tooling.
 
-When not coding, you can find me messing around with music production in FL Studio or listening to music.
+When not coding, you can find me messing around with music production in FL Studio.
 
 I am a huge fan of shows like Severance, Slow Horses, and Silo (the books are great too).
 

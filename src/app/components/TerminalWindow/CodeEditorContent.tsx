@@ -76,7 +76,7 @@ export function CodeEditorContent({
             whitespace-pre-wrap
             [text-shadow:0_0_5px_rgba(255,255,255,0.3)]
             caret-white/70
-            ${isMobile ? 'text-xs' : 'text-sm'}
+            text-lg
           `}
       >
         {children}
