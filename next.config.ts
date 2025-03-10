@@ -13,11 +13,11 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/science/:match*',
-        destination: '/_vercel/insights/:match*',
+        destination: 'https://www.ctos.sh/_vercel/insights/:match*',
       },
       {
         source: '/perf/:match*',
-        destination: '/_vercel/speed-insights/:match*',
+        destination: 'https://www.ctos.sh/_vercel/speed-insights/:match*',
       },
     ];
   },
